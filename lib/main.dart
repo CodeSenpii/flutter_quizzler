@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+//import 'question.dart';
+import 'quiz_brain.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 void main() => runApp(Quizzler());
 
@@ -25,6 +28,52 @@ class QuizPage extends StatefulWidget {
 }
 
 class _QuizPageState extends State<QuizPage> {
+  List<Widget> scoreKeeper = [
+//    Icon(
+//      Icons.check,
+//      color: Colors.green,
+//    ),
+//    Icon(
+//      Icons.close,
+//      color: Colors.red,
+//    ),
+  ];
+
+  void checkAnswer(bool userPickedAnswer) {
+    bool correctAnswer = qa.getAnswer();
+
+    if (correctAnswer == userPickedAnswer) {
+      print('right!');
+      setState(() {
+        scoreKeeper.add(Icon(
+          Icons.check,
+          color: Colors.green,
+        ));
+      });
+    } else {
+      print('Wrong!');
+      setState(() {
+        scoreKeeper.add(Icon(Icons.close, color: Colors.red));
+      });
+    }
+  }
+//  List<String> questions = [
+//    'You can lead a cow down stairs but not up stairs.',
+//    'Approximately one quarter of human bones are in the feet.',
+//    'A slug\'s blood is green.'
+//  ];
+//  List<bool> answers = [false, true, true];
+//
+//  Question q1 = Question(q: 'You can lead a cow downstairs', a: false);
+
+//  List<Question> questionBank = [
+//    Question(q: 'You can lead a cow downstairs', a: false),
+//    Question(q: 'Approximatly one quater of human bones are in...', a: true),
+//    Question(q: 'A slug\' blood is green', a: true),
+//    Question(q: 'You can lead a cow any where but to water', a: false)
+//  ];
+  QuizBrain qa = QuizBrain();
+  int questionNumber = 0;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -37,7 +86,7 @@ class _QuizPageState extends State<QuizPage> {
             padding: EdgeInsets.all(10.0),
             child: Center(
               child: Text(
-                'This is where the question text will go.',
+                qa.getQuestion(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 25.0,
@@ -62,6 +111,21 @@ class _QuizPageState extends State<QuizPage> {
               ),
               onPressed: () {
                 //The user picked true.
+                checkAnswer(true);
+                qa.isFinished();
+
+                setState(() {
+                  //qa.nextQuestion();
+                  if (qa.getIsFin() == false) {
+                    qa.nextQuestion();
+                  } else {
+                    scoreKeeper = [];
+                    qa.setIsFin();
+                    Alert(context: context, title: "Test", desc: "Done!")
+                        .show();
+                    print("Show Done! - 1");
+                  }
+                });
               },
             ),
           ),
@@ -80,11 +144,30 @@ class _QuizPageState extends State<QuizPage> {
               ),
               onPressed: () {
                 //The user picked false.
+                qa.isFinished();
+
+                checkAnswer(false);
+
+                setState(() {
+                  //qa.nextQuestion();
+                  if (qa.getIsFin() == false) {
+                    qa.nextQuestion();
+                  } else {
+                    scoreKeeper = [];
+                    qa.setIsFin();
+                    Alert(context: context, title: "RFLUTTER", desc: "Done!")
+                        .show();
+
+                    print("Show Done!- 2");
+                  }
+                });
               },
             ),
           ),
         ),
-        //TODO: Add a Row here as your score keeper
+        Row(
+          children: scoreKeeper,
+        ),
       ],
     );
   }
